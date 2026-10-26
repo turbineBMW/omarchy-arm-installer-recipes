@@ -1,4 +1,6 @@
-# Omarchy Arm Installer
+# Omarchy Arm Installer, with recipes
+
+The [Omarchy Arm installer](https://github.com/turbineBMW/omarchy-arm-installer) with device [recipes](#recipes): a model's own packages, from outside Omarchy, installed with it. The stock installer carries no recipes; this fork tracks it by merging its `main`, and carries the recipe system as the commits on top. To offer a recipe for your model, fork this repository, add your folder under [`recipes/`](recipes), set `ImageSource.Repository` in `app/Core/ImageSource.cs` to your fork, and publish your own `OmarchyArmInstaller.exe`. The installer image can stay this repository's, which `ImageSource.ImageRepository` names, unless you change the ISO too.
 
 Installs [Omarchy](https://omarchy.org) on Snapdragon laptops from their own Windows, and collects what Linux developers need to support the ones it can't yet.
 

@@ -20,7 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import pacmandb  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
-RELEASES = "https://api.github.com/repos/turbineBMW/omarchy-arm-installer/releases?per_page=30"
+RELEASES = "https://api.github.com/repos/turbineBMW/omarchy-arm-installer-recipes/releases?per_page=30"
 RESERVED = {"options", "offline", "omarchy", "core", "extra", "multilib", "alarm", "aur", "platform"}
 CHID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
 
