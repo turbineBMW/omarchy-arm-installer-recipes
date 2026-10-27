@@ -12,13 +12,15 @@ When the installer recognises a model with a recipe, it offers the repository's 
 
 | Where | What | Who writes it |
 |---|---|---|
-| This repository, `recipes/<id>/recipe.json` | Which models (CHIDs), the repository's address and key fingerprint, which packages to install, firmware the model needs | Added by PR and reviewed here |
-| This repository, `recipes/<id>/key.asc` | The repository's public signing key | Same PR |
+| Your fork of this repository, `recipes/<id>/recipe.json` | Which models (CHIDs), the repository's address and key fingerprint, which packages to install, firmware the model needs | The fork's maintainer, built into the fork's app |
+| Your fork, `recipes/<id>/key.asc` | The repository's public signing key | Same |
 | The recipe's repository, `<repo>.recipe.json` + `.sig` | What the repository says about itself: each package, what it does, whether it replaces Omarchy's, where its fix is going upstream, and whether the repository is still needed | The maintainer, signed with the repository key |
 | The recipe's repository, `<repo>.db` + `.sig`, `*.pkg.tar.*` + `.sig` | The pacman repository itself, every file signed | The maintainer |
 | Omarchy's and Arch Linux ARM's repositories | The official packages the recipe's packages depend on that the installer image does not carry; the creators work these out and put them on the stick with their upstream signatures | Nobody: taken as published |
 
 ### recipe.json
+
+The Surface Pro 11's, from [its installer](https://github.com/turbineBMW/omarchy-surface-pro-11-installer/tree/main/recipes/microsoft-surface-pro-11), shortened:
 
 ```json
 {
@@ -77,7 +79,7 @@ The installer shows `summary` and every package, with "replaces Omarchy's" on th
 
 ## How the installer trusts it
 
-The only thing trusted up front is the recipe's key fingerprint, reviewed here by PR. Everything else has to be signed by that key:
+The only thing trusted up front is the recipe's key fingerprint, built into the app by the fork that carries the recipe: whoever runs a fork's installer trusts its maintainer. Everything else has to be signed by that key:
 
 1. The Windows app takes the key from the recipe and refuses one whose fingerprint isn't the one named.
 2. It downloads the database and the description and checks both signatures. It downloads every package, checks it against the database's SHA-256, and checks its signature. Anything that fails stops the extras, and the person can install Omarchy as it comes.
@@ -113,8 +115,8 @@ sudo omarchy-recipe remove --purge   # and remove the packages only it had
 
 `remove` takes the repository out of `/etc/pacman.conf` and drops its key. It reinstalls Omarchy's own build of every package Omarchy also has (the kernel goes back to Omarchy's), and either keeps or (with `--purge`) removes the packages only the recipe had. It also turns off the daily check.
 
-**The recipe leaves this repository** with a PR deleting its folder, once nobody needs the stick to offer it.
+**The recipe leaves the installer** when its fork deletes the folder and publishes the app again, once nobody needs the stick to offer it.
 
 ## Adding one
 
-Open a pull request with the folder, after the repository publishes its signed description. `bin/check-recipes` checks the recipe and that it installs offline from the latest image (CI runs it), and `bin/fill-stick VOLUME --recipe ID --offline-db DB` downloads and checks the whole repository and the official packages the way the app does. A recipe hands its maintainer's key to pacman on every machine that accepts it, so reviews look at who maintains the repository and how it's built.
+Add the folder to your fork, after the repository publishes its signed description (the README's [Make your own installer](../README.md#make-your-own-installer) has the steps). `bin/check-recipes` checks the recipe and that it installs offline from the latest image (CI runs it), and `bin/fill-stick VOLUME --recipe ID --offline-db DB` downloads and checks the whole repository and the official packages the way the app does. A recipe hands its maintainer's key to pacman on every machine that accepts it, so the people a fork is for should know who maintains the repository and how it's built. A fork can carry several recipes, one folder each.

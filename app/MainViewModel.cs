@@ -158,8 +158,9 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
     /// The list a laptop is recognised from goes stale with the installer.
     public string ModelsNote =>
-        $"This installer ({Log.Version}) recognises the {Recipes.Models.Count} models in systemd's list when it was released, " +
-        $"and the {Recipes.All.Count} with a recipe. A newer release may know more: github.com/{ImageSource.Repository}/releases.";
+        $"This installer ({Log.Version}) recognises the {Recipes.Models.Count} models in systemd's list when it was released" +
+        (Recipes.All.Count > 0 ? $", and the {Recipes.All.Count} with a recipe" : "") +
+        $". A newer release may know more: github.com/{ImageSource.Repository}/releases.";
 
     public async Task DetectAsync()
     {

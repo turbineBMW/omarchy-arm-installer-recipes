@@ -20,7 +20,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import pacmandb  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
-RELEASES = "https://api.github.com/repos/turbineBMW/omarchy-arm-installer-recipes/releases?per_page=30"
 RESERVED = {"options", "offline", "omarchy", "core", "extra", "multilib", "alarm", "aur", "platform"}
 CHID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
 
@@ -73,11 +72,18 @@ def fetch(url: str) -> bytes:
         return r.read()
 
 
+def image_repository() -> str:
+    """Where the app downloads the installer image: ImageSource.ImageRepository."""
+    source = (ROOT / "app" / "Core" / "ImageSource.cs").read_text()
+    return re.search(r'ImageRepository = "([^"]+)"', source).group(1)
+
+
 def latest_offline_db() -> bytes | None:
     """The offline mirror database published with the newest installer image."""
     if os.environ.get("OFFLINE_DB"):
         return Path(os.environ["OFFLINE_DB"]).read_bytes()
-    for release in json.loads(fetch(RELEASES)):
+    releases = f"https://api.github.com/repos/{image_repository()}/releases?per_page=30"
+    for release in json.loads(fetch(releases)):
         if not release["tag_name"].startswith("installer-") or release["draft"]:
             continue
         for asset in release["assets"]:
@@ -110,12 +116,14 @@ def check_offline(folder: Path, offline_db: bytes, official_dbs) -> list[str]:
 
 failed = False
 folders = sorted(p for p in (ROOT / "recipes").iterdir() if p.is_dir())
+if not folders:
+    print("no recipes: the app installs Omarchy as it comes on every model")
 for folder in folders:
     problems = check(folder)
     print(f"{folder.name}: {'ok' if not problems else '; '.join(problems)}")
     failed |= bool(problems)
 
-if "--no-network" not in sys.argv and not failed:
+if "--no-network" not in sys.argv and folders and not failed:
     offline_db = latest_offline_db()
     if offline_db is None:
         print("no published image carries an offline mirror database yet; skipping the offline check")

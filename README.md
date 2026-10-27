@@ -1,6 +1,6 @@
 # Omarchy Arm Installer, with recipes
 
-The [Omarchy Arm installer](https://github.com/turbineBMW/omarchy-arm-installer) with device [recipes](#recipes): a model's own packages, from outside Omarchy, installed with it. The stock installer carries no recipes; this fork tracks it by merging its `main`, and carries the recipe system as the commits on top. To offer a recipe for your model, fork this repository, add your folder under [`recipes/`](recipes), set `ImageSource.Repository` in `app/Core/ImageSource.cs` to your fork, and publish your own `OmarchyArmInstaller.exe`. The installer image can stay this repository's, which `ImageSource.ImageRepository` names, unless you change the ISO too.
+A template for your own Omarchy installer: the [Omarchy Arm installer](https://github.com/turbineBMW/omarchy-arm-installer) with device [recipes](#recipes), a model's own packages from outside Omarchy, installed with it. Fork it, add the recipe for your laptop, and publish the installer from your fork ([Make your own installer](#make-your-own-installer)). This repository carries no recipe itself; [omarchy-surface-pro-11-installer](https://github.com/turbineBMW/omarchy-surface-pro-11-installer) is a fork made this way, for the Surface Pro 11. The template tracks the stock installer by merging its `main`, and carries the recipe system as the commits on top; a fork tracks the template the same way.
 
 Installs [Omarchy](https://omarchy.org) on Snapdragon laptops from their own Windows, and collects what Linux developers need to support the ones it can't yet.
 
@@ -27,6 +27,22 @@ The installer computes the laptop's CHIDs, the hardware IDs systemd-stub picks a
 A recipe adds a model's own packages while they make their way into Omarchy: a patched kernel, plugins, tuning. **These extras are not part of Omarchy**; they come from the recipe's maintainer, and the installer says so before anyone opts in. A recipe is a folder in [`recipes/`](recipes) with a `recipe.json` and its repository's signing key. The repository describes itself in a signed `<repo>.recipe.json`, and the installer shows what each package does from that file.
 
 Everything the installer takes from a recipe's repository must be signed by the key the recipe pins: the database, the description and every package. pacman checks them again when Omarchy installs them. Installed machines get `omarchy-recipe`, which shows what came from the repository and removes it again (`sudo omarchy-recipe remove`). When the maintainer retires the repository because Omarchy has caught up, Omarchy's updates say so. See [docs/RECIPES.md](docs/RECIPES.md).
+
+## Make your own installer
+
+1. Publish your packages as a pacman repository signed with your own key, with a signed description `<repo>.recipe.json` beside the database ([docs/RECIPES.md](docs/RECIPES.md)). [surface-pro-11-omarchy](https://github.com/turbineBMW/surface-pro-11-omarchy) builds and publishes one in GitHub Actions.
+2. Fork this repository. (GitHub won't fork a repository into the account that owns it; there, create an empty repository and push this one's history to it.)
+3. Add `recipes/<id>/recipe.json` and your repository's public key as `recipes/<id>/key.asc`, and run `bin/check-recipes`.
+4. Set `ImageSource.Repository` in [`app/Core/ImageSource.cs`](app/Core/ImageSource.cs) to your fork: the app sends people to its releases and its issues. Keep `ImageSource.ImageRepository`, which names where the installer image comes from, unless you change the ISO too; `bin/check-recipes` and `bin/publish-iso` read it from there.
+5. Publish the app. CI builds `OmarchyArmInstaller.exe` on every push; put it in a release of your fork, for example `gh release create app-2026.10.27 OmarchyArmInstaller.exe`. The app looks for images only in `installer-*` releases of `ImageRepository`, so your releases don't get in its way.
+6. Stay current with the template, which stays current with the stock installer:
+
+   ```sh
+   git remote add template https://github.com/turbineBMW/omarchy-arm-installer-recipes
+   git fetch template && git merge template/main
+   ```
+
+Your fork's installer still installs Omarchy as it comes on every other model, and still makes hardware reports.
 
 ## The stick
 

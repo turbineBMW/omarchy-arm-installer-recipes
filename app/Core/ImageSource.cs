@@ -20,7 +20,8 @@ public static class ImageSource
     /// changes this to itself.
     public const string Repository = "turbineBMW/omarchy-arm-installer-recipes";
     /// Where the installer image is published. A fork that adds a recipe
-    /// without changing the image keeps using this one.
+    /// without changing the image keeps using this one. bin/check-recipes
+    /// and bin/publish-iso read it from here.
     public const string ImageRepository = "turbineBMW/omarchy-arm-installer-recipes";
     const string TagPrefix = "installer-";
 
