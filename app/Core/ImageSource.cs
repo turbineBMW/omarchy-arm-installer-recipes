@@ -19,10 +19,10 @@ public static class ImageSource
     /// Where this app lives: its releases and issues. A fork for one model
     /// changes this to itself.
     public const string Repository = "turbineBMW/omarchy-arm-installer-recipes";
-    /// Where the installer image is published. A fork that adds a recipe
-    /// without changing the image keeps using this one. bin/check-recipes
-    /// and bin/publish-iso read it from here.
-    public const string ImageRepository = "turbineBMW/omarchy-arm-installer-recipes";
+    /// Where the installer image is published, for the stock installer and
+    /// every model installer. A fork keeps it unless it publishes its own
+    /// image; bin/check-recipes reads it from here.
+    public const string ImageRepository = "turbineBMW/omarchy-arm-images";
     const string TagPrefix = "installer-";
 
     static readonly HttpClient Http = CreateClient();

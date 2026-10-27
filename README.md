@@ -33,7 +33,7 @@ Everything the installer takes from a recipe's repository must be signed by the 
 1. Publish your packages as a pacman repository signed with your own key, with a signed description `<repo>.recipe.json` beside the database ([docs/RECIPES.md](docs/RECIPES.md)). [surface-pro-11-omarchy](https://github.com/turbineBMW/surface-pro-11-omarchy) builds and publishes one in GitHub Actions.
 2. Fork this repository. (GitHub won't fork a repository into the account that owns it; there, create an empty repository and push this one's history to it.)
 3. Add `recipes/<id>/recipe.json` and your repository's public key as `recipes/<id>/key.asc`, and run `bin/check-recipes`.
-4. Set `ImageSource.Repository` in [`app/Core/ImageSource.cs`](app/Core/ImageSource.cs) to your fork: the app sends people to its releases and its issues. Keep `ImageSource.ImageRepository`, which names where the installer image comes from, unless you change the ISO too; `bin/check-recipes` and `bin/publish-iso` read it from there.
+4. Set `ImageSource.Repository` in [`app/Core/ImageSource.cs`](app/Core/ImageSource.cs) to your fork: the app sends people to its releases and its issues. Keep `ImageSource.ImageRepository`, which names where the installer image comes from ([omarchy-arm-images](https://github.com/turbineBMW/omarchy-arm-images)); `bin/check-recipes` reads it from there.
 5. Publish the app. CI builds `OmarchyArmInstaller.exe` on every push; put it in a release of your fork, for example `gh release create app-2026.10.27 OmarchyArmInstaller.exe`. The app looks for images only in `installer-*` releases of `ImageRepository`, so your releases don't get in its way.
 6. Stay current with the template, which stays current with the stock installer:
 
@@ -46,7 +46,7 @@ Your fork's installer still installs Omarchy as it comes on every other model, a
 
 ## The stick
 
-The installer image is Omarchy's aarch64 ISO with four patches ([`iso/patches`](iso/patches)) that read a 1 GiB `OMARCHY_FW` partition on the stick:
+The installer image comes from [omarchy-arm-images](https://github.com/turbineBMW/omarchy-arm-images), which builds and publishes one image for the stock installer and the model installers alike. It is Omarchy's aarch64 ISO with patches that read a 1 GiB `OMARCHY_FW` partition on the stick, where the installer puts the firmware and the chosen recipe:
 
 ```
 OMARCHY_FW/
@@ -64,9 +64,7 @@ The patches are meant for omarchy-iso itself; once they are there, the stick is 
 
 ```sh
 dotnet publish app -c Release -r win-arm64 --self-contained true -o out   # the Windows app
-bin/build-iso                                                             # the ISO
-bin/publish-iso ISO [out/OmarchyArmInstaller.exe]                         # a release the app finds (needs unsquashfs)
-sudo bin/make-usb ISO /dev/sdX --firmware .../FileRepository --recipe ID   # a stick from Linux
+sudo bin/make-usb ISO /dev/sdX --firmware .../FileRepository --recipe ID   # a stick from Linux (needs unsquashfs)
 bin/check-recipes
 ```
 

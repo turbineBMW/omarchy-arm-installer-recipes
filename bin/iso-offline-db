@@ -5,7 +5,7 @@
 #
 # The image carries Omarchy's offline mirror inside its root file system
 # (arch/aarch64/airootfs.sfs, a squashfs); its offline.db says which packages
-# an install has without the network. publish-iso puts it beside the ISO so
+# an install has without the network. omarchy-arm-images publishes it beside the ISO so
 # the USB creators can tell which of a recipe's dependencies the stick must
 # carry. Needs bsdtar and unsquashfs (squashfs-tools).
 set -euo pipefail
